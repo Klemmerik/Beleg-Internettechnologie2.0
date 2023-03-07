@@ -1,0 +1,132 @@
+%! Eigene Befehle zur erleichterten Nutzung
+% Hilfsbefehle
+\newcommand{\fontheightsvg}[1]{\includesvg[height=1.75ex, inkscapelatex=false]{#1}}
+\newcommand{\dtfolder}{\fontheightsvg{vorlage/bilder/dirtree_folder}\hspace{0.1cm}}
+\newcommand{\dtfile}{\fontheightsvg{vorlage/bilder/dirtree_file}\hspace{0.1cm}}
+\newcommand{\dtusb}{\raisebox{.1em}{\fontheightsvg{vorlage/bilder/usb}\hspace{0.1cm}}}
+
+% Umgebungen u.Ä.
+\newcommand{\fn}[1]{\footnote{\hspace{0.5em}#1}}
+%! #1 - Breite, #2 - Dateiname, #3 Caption, #4 - Label
+\newcommand{\bild}[4][1.0]{\begin{figure}
+  \centering
+  \includegraphics[width=#1\columnwidth]{bilder/#2}
+  \caption{#3}
+  \label{#4}
+  \end{figure}}
+\newcommand{\striche}[1]{\glqq #1\grqq{}}
+%! #1 - Breite, #2 - Dateiname, #3 Caption, #4 - Label
+\newcommand{\svg}[4][1.0]{\begin{figure}
+    \centering
+    \includesvg[width=#1\columnwidth,inkscapelatex=false]{bilder/#2}
+    \caption{#3}
+    \label{#4}
+    \end{figure}}
+%! #1 - Dirtree, #2 - Caption, #3 - Label
+\newcommand{\verzeichnis}[3]{\begin{figure}
+  % https://tex.stackexchange.com/a/99591/220899
+  \renewcommand{\DTstyle}{\textrm\expandafter\raisebox{-0.7ex}}
+  \centering
+  \begin{varwidth}{\textwidth}
+    \dirtree{#1}  
+  \end{varwidth}
+  \caption{#2}
+  \label{#3}
+  \end{figure}}
+\newcommand{\logisch}[1]{$``#1``$}
+\newcommand{\vglink}[2]{\fn{vgl.~\href{#1}{#1}~(#2)}}
+% Muss statt \caption in die Umgebung wenn eine Fußnote verwendet werden soll, in Verbindung mit der Zeile darunter
+\newcommand{\linkcaption}[1]{\caption[#1]{#1\footnotemark}}
+% Muss unter die Umgebung, wenn eine Fußnote in der Umgebung verwendet werden soll
+\newcommand{\vgcaption}[2]{\footnotetext{\hspace{0.5em}vgl.~\href{#1}{#1}~(#2)}}
+\newcommand{\python}[1]{\mintinline{python}{#1}}
+%! #1 - Formel, #2 - Legende, #3 - Caption, #4 - Label
+\newcommand{\formula}[4]{\begin{formel}
+  \pretocmd{\captionbelow}{\onelinecaptionstrue}{}{}
+  \KOMAoptions{captions=centeredbeside}
+  \begin{captionbeside}[#3]{\textbf{#3}}[r]#1\end{captionbeside}
+  \pretocmd{\captionbelow}{}{}{}#2\label{#4}\end{formel}}
+
+%! Referenzierung
+\newcommand{\literef}[1]{\emph{\hyperref[{#1}]{\autoref{#1} - \nameref{#1}}}}
+\newcommand{\fullref}[1]{(\emph{\hyperref[{#1}]{siehe \autoref{#1} - \nameref{#1}}})}
+
+% Kompatibilität zu alter "Architektur"
+\let\aref\literef
+\let\bref\literef
+\let\cref\literef
+\let\fref\literef
+\let\sref\literef
+\let\tref\literef
+\let\litearef\literef
+\let\litebref\literef
+\let\litecref\literef
+\let\litefref\literef
+\let\litesref\literef
+\let\litetref\literef
+\let\fullaref\fullref
+\let\fullbref\fullref
+\let\fullcref\fullref
+\let\fullfref\fullref
+\let\fullsref\fullref
+\let\fulltref\fullref
+
+% automatische Ermittlung des ref-Typs nach https://tex.stackexchange.com/questions/33776/get-label-target-type
+\makeatletter
+
+% Helper macro to extract the type (section,subsection...) or the type name
+% out of the label reference. Works with hyperref only.
+% Argument #1 is a macro of form \def\...#1...\@nil{...}
+% Argument #2 is the label reference, e.g. "sect:test"
+\newcommand*\@autoref[2]{% \HyPsd@@@autoref from hyperref, modified
+  \expandafter\ifx\csname r@#2\endcsname\relax
+    ??%
+  \else
+    \expandafter\expandafter\expandafter\@@autoref
+        \csname r@#2\endcsname{}{}{}{}\@nil#1\@nil
+  \fi
+}
+\def\@@autoref#1#2#3#4#5\@nil#6\@nil{% \HyPsd@autorefname, modified
+  #6#4.\@nil}% Argument #4 = type and number, e.g. "section.1" or "subsection.1.2"
+
+% \reftype results in the type name, e.g. "section" or "figure".
+% The starred variant will remove a star, if existent, i.e. "section*" will become "section"
+\newcommand\reftype{%
+  \@ifstar
+    {\@autoref\@@reftype}%
+    {\@autoref\@reftype}}
+\def\@reftype#1.#2\@nil{#1}
+\def\@@reftype#1.#2\@nil{\@@@reftype#1*\@nil}
+\def\@@@reftype#1*#2\@nil{#1}
+
+% \autoreftype results in the type prose name (plus space character),
+% e.g. "section" in English or "Abschnitt" in German
+% (like \autoref, but without number).
+% \HyPsd@@autorefname is defined in the hyperref package.
+\newcommand*\autoreftype[1]{\@autoref\HyPsd@@autorefname{#1}}
+
+% An alternative version of \autoreftype without space at the end.
+% Since the \space is hard coded inside \HyPsd@@autorefname we use our
+% own version called \@autoreftype instead.
+% Furthermore we offer a starred variant which will work with labels to
+% \section* etc., too.
+\renewcommand*\autoreftype{%
+  \@ifstar
+    {\@autoref\@@autoreftype}%
+    {\@autoref\@autoreftype}}
+\def\@autoreftype#1.#2\@nil{% = \HyPsd@@autorefname without \space
+  \ltx@IfUndefined{#1autorefname}%
+    {\ltx@IfUndefined{#1name}%
+      {}%
+      {\csname#1name\endcsname}}%
+    {\csname#1autorefname\endcsname}}
+\def\@@autoreftype#1.#2\@nil{%
+  \expandafter\@autoreftype\@@@reftype#1*\@nil.\@nil}
+
+\makeatother
+
+% Bezeichnungen Unterabschnitt und Unterunterabschnitt durch Abschnitt ersetzen, auskommentieren, falls diese Bezeichner erwünscht sind
+\AtBeginDocument{%
+  \renewcommand*{\subsectionautorefname}{\sectionautorefname}%
+  \renewcommand*{\subsubsectionautorefname}{\sectionautorefname}%
+}
