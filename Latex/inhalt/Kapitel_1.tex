@@ -1,1 +1,43 @@
-\chaper{Projektplanung}
+\chapter{Projektplanung}
+\label{Projektplanung}
+
+\section{Grundkonzept}
+\label{Grundkonzept}
+
+Der Ausgangspunkt für das Projekt ist eine, von der BA-Glauchau bereitgestellte \ac{JSON} Datei.
+Die \ac{JSON} enthält die Information, wie viele Modulprüfungen der Studierende bestanden und nicht bestanden hat.
+Diese Informationen wird gespeichert und dient als Referenzwert.
+Wird die \ac{JSON} zu einem späteren Zeitpunkt erneut betrachtet, können die aktuellen Informationen mit den bereits abgespeicherten Informationen verglichen werden.
+Dabei können die vier folgenden Fälle auftreten:
+\begin{itemize}
+    \item[1.] Anzahl der bestandenen und nicht bestandenen Prüfungen ist identisch
+    \item[2.] Anzahl der bestandenen Prüfungen ist größer
+    \item[3.] Anzahl der nicht bestandenen Prüfungen ist größer
+    \item[4.] Anzahl der bestandenen und nicht bestandenen Prüfungen ist größer
+\end{itemize}
+
+Abhängig vom eintreffenden Szenario wird eine entsprechende Benachrichtigung an den Studierenden versendet.
+Zusätzlich werden die aktuellen Informationen der \ac{JSON} gespeichert und dienen als neuer Referenzwert.
+Eine Ausnahme ist hierbei der erste Fall.
+Bei diesem wird keine Benachrichtigung versendet und die Informationen der \ac{JSON} werden nicht überschrieben.
+
+%Ziel ist es, dieses Grundkonzept in einen Automatisierungsprozess zu implementieren.
+%Die Anzahl der Studierenden, welche den Benachrichtigungsservice verwenden, ist nicht bekannt.
+%Der Automatisierungsprozess wird so konzipiert, dass eine ansteigende Nutzeranzahl keinen Einfluss auf dessen Funktionsweise besitzt.
+
+
+\section{Konzipierung des Prozessablaufes}
+Um die in \literef{Grundkonzept} dargelegte Strategie in einen Automatisierungsprozess zu implementieren, werden definierte Strukturen und Abläufe benötigt.
+
+
+
+1. JSON runterladen
+2. ist die JSON valide?
+3. vergleich daten aus JSON mit Daten der DB
+4. jeweiligerr Fall trifft ein
+5. nächster User
+
+
+%was für Ressourcen brauch ich um es so umzusetzen wie es geplant ist?
+ 
+\section{Ablaufdiagramm}
