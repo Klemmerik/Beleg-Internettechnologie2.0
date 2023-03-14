@@ -6,36 +6,55 @@
 
 Der Ausgangspunkt für das Projekt ist eine, von der BA-Glauchau bereitgestellte \ac{JSON} Datei.
 Die \ac{JSON} enthält die Information, wie viele Modulprüfungen der Studierende bestanden und nicht bestanden hat.
-Diese Informationen wird gespeichert und dient als Referenzwert.
-Wird die \ac{JSON} zu einem späteren Zeitpunkt erneut betrachtet, können die aktuellen Informationen mit den bereits abgespeicherten Informationen verglichen werden.
+Diese Informationen wird in einer Datenbank gespeichert und dient als Referenzwert.
+Wird die \ac{JSON} zu einem späteren Zeitpunkt erneut betrachtet, können die aktuellen Informationen mit den bereits abgespeicherten Informationen der Datenbank verglichen werden.
 Dabei können die vier folgenden Fälle auftreten:
-\begin{itemize}
-    \item[1.] Anzahl der bestandenen und nicht bestandenen Prüfungen ist identisch
-    \item[2.] Anzahl der bestandenen Prüfungen ist größer
-    \item[3.] Anzahl der nicht bestandenen Prüfungen ist größer
-    \item[4.] Anzahl der bestandenen und nicht bestandenen Prüfungen ist größer
-\end{itemize}
+\begin{enumerate}
+    \item Anzahl der bestandenen und nicht bestandenen Prüfungen ist identisch
+    \item Anzahl der bestandenen Prüfungen ist größer
+    \item Anzahl der nicht bestandenen Prüfungen ist größer
+    \item Anzahl der bestandenen und nicht bestandenen Prüfungen ist größer
+\end{enumerate}
 
 Abhängig vom eintreffenden Szenario wird eine entsprechende Benachrichtigung an den Studierenden versendet.
-Zusätzlich werden die aktuellen Informationen der \ac{JSON} gespeichert und dienen als neuer Referenzwert.
+Zusätzlich wird der Datensatz mit den Informationen der aktuellen \ac{JSON} überschrieben und dient als neuer Referenzwert.
 Eine Ausnahme ist hierbei der erste Fall.
-Bei diesem wird keine Benachrichtigung versendet und die Informationen der \ac{JSON} werden nicht überschrieben.
+Bei diesem wird keine Benachrichtigung versendet und der Datensatz nicht aktualisiert.
 
 %Ziel ist es, dieses Grundkonzept in einen Automatisierungsprozess zu implementieren.
 %Die Anzahl der Studierenden, welche den Benachrichtigungsservice verwenden, ist nicht bekannt.
 %Der Automatisierungsprozess wird so konzipiert, dass eine ansteigende Nutzeranzahl keinen Einfluss auf dessen Funktionsweise besitzt.
 
 
-\section{Konzipierung des Prozessablaufes}
-Um die in \literef{Grundkonzept} dargelegte Strategie in einen Automatisierungsprozess zu implementieren, werden definierte Strukturen und Abläufe benötigt.
+\section{Gesamtprozess}
+\subsection{Service-Anmeldung}
+Damit der Studierende über neu eintreffende Modulnoten informiert werden kann, muss sich dieser für den Benachrichtigungsservice anmelden.
+Die Anmeldung für den Benachrichtigungsservice erfolgt über eine Webseite.
+Der Studierende wird aufgefordert, die folgenden, für den Benachrichtigungsprozess notwendigen, Daten anzugeben: Name, Matrikelnummer, Hashwert und E-Mail-Adresse.
+Nach der erfolgreicher Validierung werden die Daten des Studierenden an eine Datenbank übermittelt und als neuer Datensatz abgespeichert.
+Die Anmeldung für den Benachrichtigungsservice ist damit abgeschlossen.
+
+\subsection{Überprüfungsverfahren neuer Modulnoten}
+Die Überprüfung auf potentiell eingetroffene Modulnoten, folgt einem festen Schema.
+Die Software erhält aus der Datenbank den Datensatz eines Studierenden mit den folgenden Informationen: Name, Matrikelnummer, Hashwert, E-Mail-Adresse sowie die Anzahl bestandener und nicht bestandener Prüfungen.
+
+Mithilfe der Attribute \textit{Matrikelnummer} und \textit{Hashwert} wird eine \ac{URL} für einen HTTP-Reguest zusammengesetzt.
+Die Abfrage liefert eine \ac{JSON}-Datei zurück - \fullref{Grundkonzept}.
+Es folgt der Vergleich der Anzahl der bestandenen-/ nicht bestandenen Prüfungen aus dem Datensatz mit der Anzahl der bestandenen-/ nicht bestandenen Prüfungen aus der \ac{JSON}-Datei.
+Ist die Anzahl der bestandenen-/ nicht bestandenen Prüfungen aus der \ac{JSON}-Datei größer als die des Datensatzes, wird eine entsprechende Benachrichtigung per E-Mail-Adresse versendet.
+Die Empfänger E-Mail-Adresse entspricht dabei der E-Mail-Adresse aus dem Datensatz des Studierenden.
+Gleichzeitig wird der Datensatz durch die Anzahl der bestandenen-/ nicht bestandenen Prüfungen der \ac{JSON}-Datei aktualisiert.
+
+Im Falle, dass die Attribute \textit{bestandene Prüfungen} und \textit{nicht bestandene Prüfungen} des Datensatzes den Wert NULL aufweisen, handelt es sich um den erstmaligen Überprüfungsversuch nach der Anmeldung eines Studierenden.
+In diesem Fall werden die Werte NULL durch die Werte der \ac{JSON}-Datei aktualisiert und eine Bestätigungsemail über die erfolgreiche Anmeldung des Benachrichtigungsservices versendet.
+
+Der gesamte Ablauf wird für jeden Datensatz (Studierenden) der Datenbank genau einmal durchgeführt. 
 
 
 
-1. JSON runterladen
-2. ist die JSON valide?
-3. vergleich daten aus JSON mit Daten der DB
-4. jeweiligerr Fall trifft ein
-5. nächster User
+
+
+
 
 
 %was für Ressourcen brauch ich um es so umzusetzen wie es geplant ist?
